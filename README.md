@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/banner.png" alt="AI Image Pipeline — Resonate example" />
+</p>
+
 # AI Image Pipeline
 
 Generate multiple style variations of an image prompt in parallel, with automatic crash recovery.
