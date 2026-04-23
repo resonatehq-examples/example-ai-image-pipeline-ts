@@ -160,24 +160,17 @@ example-ai-image-pipeline-ts/
 
 **Lines of code**: ~120 total. The workflow itself is 20 lines.
 
-## Comparison
+## Why a generator handles fan-out/fan-in
 
-Restate's AI image workflow ([github](https://github.com/restatedev/examples/tree/main/typescript/end-to-end-applications/ai-image-workflows)) is a JSON-DSL workflow executor with 6 services: a workflow orchestrator, PuppeteerService, StableDiffusion (generate), StableDiffusion (transform), and TransformerService (rotate/blur). It requires a running Restate server, npm for registration, and optionally Stable Diffusion (GPU required) or Puppeteer (browser required).
+Fan-out/fan-in often implies orchestration infrastructure: a workflow engine, per-service registrations, a scheduler that tracks which branch finished. This example skips all of that.
 
-| | Resonate | Restate |
-|---|---|---|
-| Source files | 3 | 6 |
-| Total LOC | ~120 | ~306 |
-| Server required | No | Yes |
-| Setup | `bun install && bun start` | npm install + Restate server + service registration + optional GPU/Puppeteer |
-| Parallel execution | `ctx.beginRun()` | `ctx.genericCall()` per service |
-| Provider plug-in | Swap one function | Add a new registered service |
+`ctx.beginRun()` starts a branch without blocking and returns a future. `yield* future` waits for one specific branch without blocking the others. Fan-in is a loop over the futures array. If one generator throws, Resonate retries it independently — the other branches keep running.
 
-Where Restate wins: the JSON-DSL approach lets non-developers define pipeline steps without changing code. The separate service model enables independent scaling of each processor.
+The orchestration primitive is the generator itself. The scheduler is the event loop. The state machine is whatever the function closure already carried. ~120 LOC of source, 20 lines of workflow logic, no external server for development.
 
-Where Resonate wins: for most use cases, a generator function with `beginRun` is simpler to write, test, and understand than a multi-service architecture. No server required for development.
+Swap the simulated provider for a real one (DALL-E, Stability AI, Midjourney, Replicate) and the durability contract doesn't change — `ctx.run()` still retries the call, `ctx.beginRun()` still parallelizes, results are still durable.
 
 ## Learn More
 
 - [Resonate documentation](https://docs.resonatehq.io)
-- [Restate AI image workflow](https://github.com/restatedev/examples/tree/main/typescript/end-to-end-applications/ai-image-workflows) -- compare for yourself
+- [Fan-out/fan-in example](https://github.com/resonatehq-examples/example-fan-out-fan-in-ts) -- the same primitive in its minimal shape
