@@ -1,3 +1,11 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/banner-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="./assets/banner-light.png">
+    <img alt="AI Image Pipeline — Resonate example" src="./assets/banner-dark.png">
+  </picture>
+</p>
+
 # AI Image Pipeline
 
 Generate multiple style variations of an image prompt in parallel, with automatic crash recovery.
